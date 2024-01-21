@@ -4,23 +4,26 @@ const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
 const webPush = require("web-push");
+const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
+app.use(cors());
 app.use(express.json());
 
 let subscribed = [];
 
-// const publicKey =
-//   "BCRMXt1KpONBNVLwaae1F5M6rRqBB-c79xXZ_UcWufu4ZHHAWtSJuStvUSx0wl8a110vQ4HU2aZnjXuoJumuGJs";
-// const privateKey = "-WuHDApwUMghjwMFToirIn1iBnXCZfeW8gYe6-TaFmU";
+const publicKey =
+  "BCRMXt1KpONBNVLwaae1F5M6rRqBB-c79xXZ_UcWufu4ZHHAWtSJuStvUSx0wl8a110vQ4HU2aZnjXuoJumuGJs";
+const privateKey = "-WuHDApwUMghjwMFToirIn1iBnXCZfeW8gYe6-TaFmU";
 
-// webPush.setVapidDetails(
-//   "mailto:alex.maslennikova19@gmail.com", // Your contact information
-//   publicKey,
-//   privateKey
-// );
+webPush.setVapidDetails(
+  "mailto:alex.maslennikova19@gmail.com", // Your contact information
+  publicKey,
+  privateKey
+);
 
 wss.on("connection", (ws) => {
   console.log("Client connected");
@@ -69,10 +72,10 @@ setInterval(() => {
   broadcastMessage("Message from server!");
 }, 5000);
 
-// // Example: Send a message every 5 seconds
-// setInterval(() => {
-//   sendPushNotification("Push notification from server!");
-// }, 10000);
+// Example: Send a message every 5 seconds
+setInterval(() => {
+  sendPushNotification("Push notification from server!");
+}, 10000);
 
 server.listen(3001, () => {
   console.log("Server listening on port 3001");
