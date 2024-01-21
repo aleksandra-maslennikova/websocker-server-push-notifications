@@ -10,7 +10,14 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-app.use(cors());
+const corsOptions = {
+  origin: "*", // Change to your React app's origin
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Enable credentials (cookies, authorization headers)
+  optionsSuccessStatus: 204, // Respond to preflight requests with 204 status code
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 let subscribed = [];
