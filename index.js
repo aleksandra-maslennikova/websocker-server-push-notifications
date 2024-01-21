@@ -68,8 +68,11 @@ app.post("/subscribe", (req, res) => {
 function sendPushNotification(message) {
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
+      console.log({ client });
       const payload = JSON.stringify({ title: "Notification", body: message });
-      webPush.sendNotification(client.subscription, payload);
+      if (client.subscription) {
+        webPush.sendNotification(client.subscription, payload);
+      }
     }
   });
 }
