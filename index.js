@@ -30,11 +30,6 @@ webPush.setVapidDetails(
   privateKey
 );
 
-function handleSubscribe(ws, subscription) {
-  console.log("Received subscription:", subscription);
-  subscribed.push({ ws, subscription });
-}
-
 wss.on("connection", (ws) => {
   console.log("Client connected");
 
@@ -47,12 +42,12 @@ wss.on("connection", (ws) => {
   ws.on("close", () => {
     console.log("Client disconnected");
   });
+});
 
-  app.post("/subscribe", (req, res) => {
-    const subscription = req.body;
-    handleSubscribe(ws, subscription);
-    res.status(201).json({});
-  });
+app.post("/subscribe", (req, res) => {
+  const subscription = req.body;
+  subscribed.push(subscription);
+  res.status(201).json({});
 });
 
 function broadcastMessage(message) {
@@ -65,16 +60,13 @@ function broadcastMessage(message) {
 
 // Broadcast a push notification to all subscribed clients
 function sendPushNotification(message) {
-  subscribed.forEach(({ ws, subscription }) => {
-    console.log(ws?.readyState);
-    if (ws.readyState === WebSocket.OPEN) {
-      console.log("Sending push...");
-      const payload = JSON.stringify({ title: "Notification", body: message });
-      console.log("push payload", payload);
-      webPush.sendNotification(subscription, payload).catch((error) => {
-        console.error("Error sending push notification:", error);
-      });
-    }
+  subscribed.forEach((subscription) => {
+    console.log(subscription);
+    const payload = JSON.stringify({ title: "Notification", body: message });
+    console.log("push payload", payload);
+    webPush.sendNotification(subscription, payload).catch((error) => {
+      console.error("Error sending push notification:", error);
+    });
   });
 }
 
@@ -83,7 +75,7 @@ setInterval(() => {
   broadcastMessage("Message from server!");
 }, 5000);
 
-// Example: Send push every  30 sec
+// Example: Send push every  5 sec
 setInterval(() => {
   sendPushNotification("Push notification from server!");
 }, 5000);
