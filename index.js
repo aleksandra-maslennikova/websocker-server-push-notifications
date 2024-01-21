@@ -44,6 +44,11 @@ wss.on("connection", (ws) => {
   ws.on("close", () => {
     console.log("Client disconnected");
   });
+
+  ws.on("subscribe", (subscription) => {
+    console.log("Received subscription:", subscription);
+    ws.subscription = subscription;
+  });
 });
 
 function broadcastMessage(message) {
@@ -67,12 +72,11 @@ app.post("/subscribe", (req, res) => {
 // Broadcast a push notification to all subscribed clients
 function sendPushNotification(message) {
   wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      console.log({ client });
+    if (client.readyState === WebSocket.OPEN && client.subscription) {
       const payload = JSON.stringify({ title: "Notification", body: message });
-      if (client.subscription) {
-        webPush.sendNotification(client.subscription, payload);
-      }
+      webPush.sendNotification(client.subscription, payload).catch((error) => {
+        console.error("Error sending push notification:", error);
+      });
     }
   });
 }
@@ -82,10 +86,10 @@ setInterval(() => {
   broadcastMessage("Message from server!");
 }, 5000);
 
-// Example: Send a message every 5 seconds
+// Example: Send push every  30 sec
 setInterval(() => {
   sendPushNotification("Push notification from server!");
-}, 10000);
+}, 30000);
 
 server.listen(3001, () => {
   console.log("Server listening on port 3001");
