@@ -78,7 +78,7 @@ setInterval(() => {
 // Example: Send push every  5 sec
 setInterval(() => {
   sendPushNotification("Push notification from server!");
-}, 5000);
+}, 60000);
 
 server.listen(3001, () => {
   console.log("Server listening on port 3001");
