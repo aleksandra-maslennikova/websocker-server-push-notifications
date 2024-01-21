@@ -30,6 +30,11 @@ webPush.setVapidDetails(
   privateKey
 );
 
+function handleSubscribe(ws, subscription) {
+  console.log("Received subscription:", subscription);
+  subscribed.push({ ws, subscription });
+}
+
 wss.on("connection", (ws) => {
   console.log("Client connected");
 
@@ -42,12 +47,13 @@ wss.on("connection", (ws) => {
   ws.on("close", () => {
     console.log("Client disconnected");
   });
-});
 
-function handleSubscribe(ws, subscription) {
-  console.log("Received subscription:", subscription);
-  subscribed.push({ ws, subscription });
-}
+  app.post("/subscribe", (req, res) => {
+    const subscription = req.body;
+    handleSubscribe(ws, subscription);
+    res.status(201).json({});
+  });
+});
 
 function broadcastMessage(message) {
   wss.clients.forEach((client) => {
