@@ -66,9 +66,11 @@ app.post("/subscribe", (req, res) => {
 // Broadcast a push notification to all subscribed clients
 function sendPushNotification(message) {
   subscribed.forEach(({ ws, subscription }) => {
-    console.log({ ws, subscription });
+    console.log(ws?.readyState);
     if (ws.readyState === WebSocket.OPEN) {
+      console.log("Sending push...");
       const payload = JSON.stringify({ title: "Notification", body: message });
+      console.log("push payload", payload);
       webPush.sendNotification(subscription, payload).catch((error) => {
         console.error("Error sending push notification:", error);
       });
@@ -84,7 +86,7 @@ setInterval(() => {
 // Example: Send push every  30 sec
 setInterval(() => {
   sendPushNotification("Push notification from server!");
-}, 30000);
+}, 5000);
 
 server.listen(3001, () => {
   console.log("Server listening on port 3001");
