@@ -44,11 +44,6 @@ wss.on("connection", (ws) => {
   ws.on("close", () => {
     console.log("Client disconnected");
   });
-
-  ws.on("subscribe", (subscription) => {
-    console.log("Received subscription:", subscription);
-    ws.subscription = subscription;
-  });
 });
 
 function broadcastMessage(message) {
@@ -63,9 +58,7 @@ function broadcastMessage(message) {
 app.post("/subscribe", (req, res) => {
   const subscription = req.body;
   subscribed.push(subscription);
-  console.log({ subscribed });
-  // Store the subscription information or handle as needed
-
+  wss.subscription = subscription;
   res.status(201).json({});
 });
 
