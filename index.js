@@ -1,5 +1,3 @@
-// index.js
-
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
@@ -46,6 +44,11 @@ wss.on("connection", (ws) => {
   });
 });
 
+function handleSubscribe(ws, subscription) {
+  console.log("Received subscription:", subscription);
+  subscribed.push({ ws, subscription });
+}
+
 function broadcastMessage(message) {
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
@@ -53,21 +56,19 @@ function broadcastMessage(message) {
     }
   });
 }
-
 // Endpoint to subscribe for push notifications
 app.post("/subscribe", (req, res) => {
   const subscription = req.body;
-  subscribed.push(subscription);
-  wss.subscription = subscription;
+  handleSubscribe(res, subscription);
   res.status(201).json({});
 });
 
 // Broadcast a push notification to all subscribed clients
 function sendPushNotification(message) {
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN && client.subscription) {
+  subscribed.forEach(({ ws, subscription }) => {
+    if (ws.readyState === WebSocket.OPEN) {
       const payload = JSON.stringify({ title: "Notification", body: message });
-      webPush.sendNotification(client.subscription, payload).catch((error) => {
+      webPush.sendNotification(subscription, payload).catch((error) => {
         console.error("Error sending push notification:", error);
       });
     }
