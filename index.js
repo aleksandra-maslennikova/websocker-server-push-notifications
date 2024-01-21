@@ -66,6 +66,7 @@ app.post("/subscribe", (req, res) => {
 // Broadcast a push notification to all subscribed clients
 function sendPushNotification(message) {
   subscribed.forEach(({ ws, subscription }) => {
+    console.log({ ws, subscription });
     if (ws.readyState === WebSocket.OPEN) {
       const payload = JSON.stringify({ title: "Notification", body: message });
       webPush.sendNotification(subscription, payload).catch((error) => {
