@@ -62,12 +62,6 @@ function broadcastMessage(message) {
     }
   });
 }
-// Endpoint to subscribe for push notifications
-app.post("/subscribe", (req, res) => {
-  const subscription = req.body;
-  handleSubscribe(res, subscription);
-  res.status(201).json({});
-});
 
 // Broadcast a push notification to all subscribed clients
 function sendPushNotification(message) {
